@@ -1,14 +1,26 @@
 import pyautogui
 from datetime import datetime
 import psutil
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 from langchain.agents import initialize_agent, Tool
 import keyboard
 
 # ------------------------
-# 1. Yerli LLM (Ollama)
+# Yerli LLM (Ollama)
 # ------------------------
-llm = Ollama(model="gemma3:4b")
+llm = OllamaLLM(model="gemma3:4b")
+
+# ------------------------
+# 1. Alət: Chat
+# ------------------------
+def chat_with_agent(_):
+    return f"Chat ilə suallara cevab verin."
+
+chat_tool = Tool(
+    name="Chat",
+    func=chat_with_agent,
+    description="Chat ilə suallara cevab verin."
+)
 
 # ------------------------
 # 2. Alət: Saat
@@ -99,11 +111,11 @@ def press_key(key_command):
 press_key_tool = Tool(
     name="Düyməyə Basmaq",
     func=press_key,
-    description="Verilən düyməyə basır. Nümunə: 'Enter düyməsinə bas', 'tab düyməsinə bas'."
+    description="Verilən düyməyə basır. Nümunə: 'Enter düyməsinə bas' 'enter', 'tab düyməsinə bas' 'tab', 'Win düyməsinə bas' 'win'."
 )
 
 # ------------------------
-# 7. Sistem promptu
+#  Sistem promptu
 # ------------------------
 system_prompt = (
     "Sən köməkçi AI-sən. İstifadəçinin sorğularını analiz et və "
@@ -111,16 +123,17 @@ system_prompt = (
     "Məsələn, istifadəçi 'Saat və sistem vəziyyəti' desə əvvəl 'Saat', sonra 'Sistem Vəziyyəti' alətini çağır. "
     "Musiqi ilə bağlı əmrlər üçün 'Musiqi Nəzarəti' alətini, "
     "düyməyə basma əmrləri üçün 'Düyməyə Basmaq' alətini istifadə et, "
-    "sistem vəziyyəti üçün 'Sistem Vəziyyəti', "
-    "mətni yazmaq üçün 'Mətn Yazmaq' alətini istifadə et. "
+    "sistem vəziyyəti üçün 'Sistem Vəziyyəti', alətini istifadə et, "
+    "mətni yazmaq üçün 'Mətn Yazmaq' alətini istifadə et, "
+    "Chat ilə suallara cevab verinmək üçün 'Chat' alətini istifadə et, "
     "Nəticələri istifadəçiyə aydın və başa düşülən şəkildə təqdim et."
 )
 
 # ------------------------
-# 8. Agent yaratmaq
+#  Agent yaratmaq
 # ------------------------
 agent = initialize_agent(
-    tools=[time_tool, system_tool, music_tool, typing_tool, press_key_tool],
+    tools=[time_tool, system_tool, music_tool, typing_tool, press_key_tool, chat_tool],
     llm=llm,
     agent="zero-shot-react-description",
     verbose=True,
@@ -128,7 +141,7 @@ agent = initialize_agent(
 )
 
 # ------------------------
-# 9. Chat dövrü
+#  Chat dövrü
 # ------------------------
 chat_history = []
 
@@ -138,7 +151,8 @@ while True:
         print("Söhbət dayandırıldı.")
         break
 
-    cevap = agent({"input": user_input})
+    # ⚡ LangChain 1.0 uyumlu: invoke() istifadə olunur
+    cevap = agent.invoke({"input": user_input})
     
     # Cevabı dict içərisində gəldiyini düşünərək çıxarırıq
     agent_output = cevap.get('output', str(cevap))
