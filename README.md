@@ -1,6 +1,6 @@
 # Azer AI - Lokal Süni Zəka Köməkçisi
 
-**Azer AI**, **LangChain** kitabxanası və lokal LLM (Ollama) istifadə edərək kompüterinizdə müxtəlif vəzifələri yerinə yetirə bilən interaktiv süni zəka köməkçisidir. Bu layihə sayəsində sistem vəziyyətini yoxlaya, musiqi çalaya, mətn yaza və düymələrə avtomatik basa bilərsiniz. Bütün əmrlər və cavablar **Azericedir**.
+**Azer AI**, **LangChain** kitabxanası və lokal LLM (Ollama) istifadə edərək kompüterinizdə müxtəlif vəzifələri yerinə yetirə bilən interaktiv süni zəka köməkçisidir. Bu layihə tam ai ilə əmrlər verə bilərsiniz. Bütün əmrlər və cavablar **Azericedir**.
 
 ---
 
@@ -26,6 +26,9 @@
      - Nümunə: `"yaz salam dünya"`  
   5. **Düyməyə Basmaq**: PyAutoGUI vasitəsilə seçilmiş düyməyə basır.  
      - Nümunə: `"Enter düyməsinə bas"`, `"tab düyməsinə bas"`  
+  6. **Axtarış**: İnternetdə DuckDuckGo vasitəsilə məlumat axtarır. 
+     - Nümunə: `"Python haqqında məlumat axtar"`, `"Xəbər məlumatı axtar"`
+  
 
 - **İnteraktiv Chat Dövrü**  
   - İstifadəçi sorğu verir və LangChain agenti uyğun alətləri seçərək cavab verir.  
