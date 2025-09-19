@@ -44,4 +44,4 @@
 1. **Python 3.10+** quraşdırın.  
 2. Lazımi paketləri yükləyin:
 ```bash
-pip install pyautogui keyboard psutil langchain langchain_community
+pip install pyautogui keyboard psutil langchain langchain_community bs4 BeautifulSoup
