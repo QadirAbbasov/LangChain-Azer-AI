@@ -4,6 +4,8 @@ import psutil
 from langchain_ollama import OllamaLLM
 from langchain.agents import initialize_agent, Tool
 import keyboard
+import requests
+from bs4 import BeautifulSoup
 
 # ------------------------
 # Yerli LLM (Ollama)
@@ -114,6 +116,35 @@ press_key_tool = Tool(
     description="Verilən düyməyə basır. Nümunə: 'Enter düyməsinə bas' 'enter', 'tab düyməsinə bas' 'tab', 'Win düyməsinə bas' 'win'."
 )
 
+
+# ------------------------
+# 7. Alət: DuckDuckGo Axtarış
+# ------------------------
+def search_tool_func(query):
+    if not query:
+        return "Axtarış üçün sorğu daxil edilməyib."
+    try:
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(f"https://duckduckgo.com/html/?q={query}", headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
+        results = []
+
+        # DuckDuckGo nəticələri a.result__a içindədir
+        for link_tag in soup.select("a.result__a")[:3]:  # İlk 3 nəticə
+            title = link_tag.get_text(strip=True)
+            link = link_tag['href']
+            results.append(f"{title} - {link}")
+
+        return "\n".join(results) if results else "Nəticə tapılmadı."
+    except Exception as e:
+        return f"Axtarış zamanı xəta baş verdi: {str(e)}"
+
+search_tool = Tool(
+    name="Axtarış",
+    func=search_tool_func,
+    description="İnternetdə DuckDuckGo vasitəsilə məlumat axtarır. Nümunə: 'Python haqqında məlumat axtar'."
+)
+
 # ------------------------
 #  Sistem promptu
 # ------------------------
@@ -126,6 +157,7 @@ system_prompt = (
     "sistem vəziyyəti üçün 'Sistem Vəziyyəti', alətini istifadə et, "
     "mətni yazmaq üçün 'Mətn Yazmaq' alətini istifadə et, "
     "Chat ilə suallara cevab verinmək üçün 'Chat' alətini istifadə et, "
+    "DuckDuckGo axtarışını etmək üçün 'Axtarış' alətini istifadə et, "
     "Nəticələri istifadəçiyə aydın və başa düşülən şəkildə təqdim et."
 )
 
@@ -133,7 +165,7 @@ system_prompt = (
 #  Agent yaratmaq
 # ------------------------
 agent = initialize_agent(
-    tools=[time_tool, system_tool, music_tool, typing_tool, press_key_tool, chat_tool],
+    tools=[time_tool, system_tool, music_tool, typing_tool, press_key_tool, chat_tool, search_tool],
     llm=llm,
     agent="zero-shot-react-description",
     verbose=True,
